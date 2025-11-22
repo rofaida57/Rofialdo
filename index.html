@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roveldo - Professional Pool</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-info-panel">
+            <h1>Roveldo</h1>
+            <div class="players-container">
+                <div id="player1-info" class="player-info active">
+                    <div class="player-name">Player 1</div>
+                    <div class="player-type">--- </div>
+                    <div class="player-score">0</div>
+                </div>
+                <div id="player2-info" class="player-info">
+                    <div class="player-name">Player 2</div>
+                    <div class="player-type">--- </div>
+                    <div class="player-score">0</div>
+                </div>
+            </div>
+            <div id="game-status-message" class="status-message">
+                Player 1's Turn
+            </div>
+            <button id="new-game-btn" class="new-game-btn">New Game</button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="game-canvas"></canvas>
+            <div id="power-meter" class="power-meter">
+                <div class="power-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
