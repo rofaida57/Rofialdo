@@ -11,7 +11,7 @@ const Engine = Matter.Engine,
 const TABLE_WIDTH = 1000;
 const TABLE_HEIGHT = 500;
 const BALL_RADIUS = 15;
-const POCKET_RADIUS = 25;
+const POCKET_RADIUS = 30; // Increased for easier pocketing
 const FRICTION = 0.005;
 const RESTITUTION = 0.95;
 const MAX_POWER = 0.15;
@@ -181,19 +181,13 @@ const pockets = [
 ];
 
 function checkPockets() {
-    if (!gameState.cueBall) return;
-    
     // Check cue ball in pocket
-    for (const pocket of pockets) {
-        if (Vector.magnitude(Vector.sub(gameState.cueBall.position, pocket)) < POCKET_RADIUS) {
-            handleFoul("Foul! Scratch.");
-            World.remove(engine.world, gameState.cueBall);
-            gameState.cueBall = Bodies.circle(250, TABLE_HEIGHT / 2, BALL_RADIUS, {
-                restitution: RESTITUTION, friction: FRICTION, frictionAir: 0.01,
-                label: 'cue', render: { fillStyle: ballDefinitions.cue.color }
-            });
-            World.add(engine.world, gameState.cueBall);
-            return;
+    if (gameState.cueBall) {
+        for (const pocket of pockets) {
+            if (Vector.magnitude(Vector.sub(gameState.cueBall.position, pocket)) < POCKET_RADIUS) {
+                handleCueBallPocketed();
+                return;
+            }
         }
     }
 
@@ -212,6 +206,24 @@ function checkPockets() {
             }
         }
     }
+}
+
+function handleCueBallPocketed() {
+    sounds.foul.play();
+    updateStatusMessage("Foul! Scratch. Player 2's turn.");
+    
+    // Remove the cue ball
+    World.remove(engine.world, gameState.cueBall);
+    
+    // Reset the cue ball
+    gameState.cueBall = Bodies.circle(250, TABLE_HEIGHT / 2, BALL_RADIUS, {
+        restitution: RESTITUTION, friction: FRICTION, frictionAir: 0.01,
+        label: 'cue', render: { fillStyle: ballDefinitions.cue.color }
+    });
+    World.add(engine.world, gameState.cueBall);
+    
+    // Switch player
+    switchPlayer();
 }
 
 function handleBallPocketed(ballLabel) {
@@ -294,9 +306,11 @@ function gameLoop() {
     const allBodies = [...gameState.balls, gameState.cueBall].filter(b => b);
     const isAnyBallMoving = allBodies.some(body => body.speed > 0.2);
 
+    // Check for pockets continuously
+    checkPockets();
+
     if (gameState.isMoving && !isAnyBallMoving) {
         gameState.isMoving = false;
-        checkPockets();
         
         // Check if any ball was hit
         if (gameState.firstHit === null) {
