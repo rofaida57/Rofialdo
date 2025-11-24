@@ -256,8 +256,13 @@ function handleBallPocketed(ballLabel) {
     const isCorrectBall = (currentPlayerType === 'Solids' && ballLabel <= 7) || (currentPlayerType === 'Stripes' && ballLabel > 8);
 
     if (isCorrectBall) {
-        if (gameState.currentPlayer === 1) gameState.player1Score++;
-        else gameState.player2Score++;
+        if (gameState.currentPlayer === 1) {
+            gameState.player1Score++;
+            console.log("Player 1 score:", gameState.player1Score); // Debug log
+        } else {
+            gameState.player2Score++;
+            console.log("Player 2 score:", gameState.player2Score); // Debug log
+        }
         updateUI();
         updateStatusMessage(`Player ${gameState.currentPlayer} pocketed a ball! Continue playing.`);
     } else {
@@ -396,17 +401,30 @@ Events.on(render, 'afterRender', () => {
 
 // ========= UI MANAGEMENT =========
 function updateUI() {
-    document.querySelector('#player1-info .player-score').textContent = gameState.player1Score;
-    document.querySelector('#player2-info .player-score').textContent = gameState.player2Score;
-    document.querySelector('#player1-info .player-type').textContent = gameState.player1Type || 'Not Assigned';
-    document.querySelector('#player2-info .player-type').textContent = gameState.player2Type || 'Not Assigned';
+    console.log("Updating UI - Player 1 score:", gameState.player1Score, "Player 2 score:", gameState.player2Score); // Debug log
+    
+    const player1ScoreElement = document.querySelector('#player1-info .player-score');
+    const player2ScoreElement = document.querySelector('#player2-info .player-score');
+    
+    if (player1ScoreElement) player1ScoreElement.textContent = gameState.player1Score;
+    if (player2ScoreElement) player2ScoreElement.textContent = gameState.player2Score;
+    
+    const player1TypeElement = document.querySelector('#player1-info .player-type');
+    const player2TypeElement = document.querySelector('#player2-info .player-type');
+    
+    if (player1TypeElement) player1TypeElement.textContent = gameState.player1Type || 'Not Assigned';
+    if (player2TypeElement) player2TypeElement.textContent = gameState.player2Type || 'Not Assigned';
 
-    document.getElementById('player1-info').classList.toggle('active', gameState.currentPlayer === 1);
-    document.getElementById('player2-info').classList.toggle('active', gameState.currentPlayer === 2);
+    const player1Info = document.getElementById('player1-info');
+    const player2Info = document.getElementById('player2-info');
+    
+    if (player1Info) player1Info.classList.toggle('active', gameState.currentPlayer === 1);
+    if (player2Info) player2Info.classList.toggle('active', gameState.currentPlayer === 2);
 }
 
 function updateStatusMessage(message) {
-    document.getElementById('game-status-message').textContent = message;
+    const statusElement = document.getElementById('game-status-message');
+    if (statusElement) statusElement.textContent = message;
 }
 
 function resetGame() {
@@ -444,12 +462,25 @@ const modal = document.getElementById("instructions-modal");
 const instructionsBtn = document.getElementById("instructions-btn");
 const closeBtn = document.getElementsByClassName("close")[0];
 
-instructionsBtn.onclick = function() {
-    modal.style.display = "block";
+// Make sure the instructions button is visible and working
+if (instructionsBtn) {
+    instructionsBtn.style.display = "block";
+    instructionsBtn.style.visibility = "visible";
+    instructionsBtn.style.opacity = "1";
+    
+    instructionsBtn.onclick = function() {
+        if (modal) {
+            modal.style.display = "block";
+        }
+    }
 }
 
-closeBtn.onclick = function() {
-    modal.style.display = "none";
+if (closeBtn) {
+    closeBtn.onclick = function() {
+        if (modal) {
+            modal.style.display = "none";
+        }
+    }
 }
 
 window.onclick = function(event) {
@@ -464,4 +495,14 @@ document.getElementById('new-game-btn').addEventListener('click', resetGame);
 window.addEventListener('load', () => {
     resetGame();
     gameLoop();
+    
+    // Ensure instructions button is visible after page load
+    setTimeout(() => {
+        const instructionsBtn = document.getElementById("instructions-btn");
+        if (instructionsBtn) {
+            instructionsBtn.style.display = "block";
+            instructionsBtn.style.visibility = "visible";
+            instructionsBtn.style.opacity = "1";
+        }
+    }, 500);
 });
