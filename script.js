@@ -52,7 +52,6 @@ const ballDefinitions = {
     cue: { color: '#FFFFFF', number: '', stripe: false }
 };
 
-
 // Game state variables
 let gameState = {
     currentPlayer: 1,
@@ -67,7 +66,8 @@ let gameState = {
     aimLine: { start: null, end: null },
     power: 0,
     firstHit: null, // To track the first ball hit in a turn
-    gameOver: false
+    gameOver: false,
+    consecutiveFouls: 0
 };
 
 // ========= SOUNDS =========
@@ -183,6 +183,7 @@ const pockets = [
 function checkPockets() {
     if (!gameState.cueBall) return;
     
+    // Check cue ball in pocket
     for (const pocket of pockets) {
         if (Vector.magnitude(Vector.sub(gameState.cueBall.position, pocket)) < POCKET_RADIUS) {
             handleFoul("Foul! Scratch.");
@@ -196,6 +197,7 @@ function checkPockets() {
         }
     }
 
+    // Check other balls in pocket
     for (let i = gameState.balls.length - 1; i >= 0; i--) {
         const ball = gameState.balls[i];
         if (!ball) continue;
@@ -225,6 +227,7 @@ function handleBallPocketed(ballLabel) {
         return;
     }
 
+    // First ball pocketed determines player types
     if (!gameState.player1Type) {
         if (ballLabel <= 7) {
             gameState.player1Type = 'Solids';
@@ -234,6 +237,7 @@ function handleBallPocketed(ballLabel) {
             gameState.player2Type = 'Solids';
         }
         updateUI();
+        updateStatusMessage(`Player ${gameState.currentPlayer} is ${gameState.currentPlayer === 1 ? gameState.player1Type : gameState.player2Type}`);
     }
 
     const currentPlayerType = gameState.currentPlayer === 1 ? gameState.player1Type : gameState.player2Type;
@@ -243,6 +247,7 @@ function handleBallPocketed(ballLabel) {
         if (gameState.currentPlayer === 1) gameState.player1Score++;
         else gameState.player2Score++;
         updateUI();
+        updateStatusMessage(`Player ${gameState.currentPlayer} pocketed a ball! Continue playing.`);
     } else {
         handleFoul("Foul! Wrong ball pocketed.");
     }
@@ -251,6 +256,7 @@ function handleBallPocketed(ballLabel) {
 function handleFoul(message) {
     sounds.foul.play();
     updateStatusMessage(message);
+    gameState.consecutiveFouls++;
     switchPlayer();
 }
 
@@ -291,12 +297,15 @@ function gameLoop() {
     if (gameState.isMoving && !isAnyBallMoving) {
         gameState.isMoving = false;
         checkPockets();
+        
+        // Check if any ball was hit
         if (gameState.firstHit === null) {
              handleFoul("Foul! No ball was hit.");
         } else {
             const currentPlayerType = gameState.currentPlayer === 1 ? gameState.player1Type : gameState.player2Type;
             if (currentPlayerType) {
-                const isCorrectFirstHit = (currentPlayerType === 'Solids' && gameState.firstHit <= 7) || (currentPlayerType === 'Stripes' && gameState.firstHit > 8 && gameState.firstHit !== 8);
+                const isCorrectFirstHit = (currentPlayerType === 'Solids' && gameState.firstHit <= 7) || 
+                                         (currentPlayerType === 'Stripes' && gameState.firstHit > 8 && gameState.firstHit !== 8);
                 if (!isCorrectFirstHit) {
                     handleFoul("Foul! Hit opponent's ball first.");
                 }
@@ -339,7 +348,6 @@ function drawBall(context, body) {
     }
 }
 
-
 Events.on(render, 'afterRender', () => {
     const context = render.canvas.getContext('2d');
     
@@ -376,8 +384,8 @@ Events.on(render, 'afterRender', () => {
 function updateUI() {
     document.querySelector('#player1-info .player-score').textContent = gameState.player1Score;
     document.querySelector('#player2-info .player-score').textContent = gameState.player2Score;
-    document.querySelector('#player1-info .player-type').textContent = gameState.player1Type || '---';
-    document.querySelector('#player2-info .player-type').textContent = gameState.player2Type || '---';
+    document.querySelector('#player1-info .player-type').textContent = gameState.player1Type || 'Not Assigned';
+    document.querySelector('#player2-info .player-type').textContent = gameState.player2Type || 'Not Assigned';
 
     document.getElementById('player1-info').classList.toggle('active', gameState.currentPlayer === 1);
     document.getElementById('player2-info').classList.toggle('active', gameState.currentPlayer === 2);
@@ -392,19 +400,48 @@ function resetGame() {
     Engine.clear(engine);
     
     gameState = {
-        currentPlayer: 1, player1Type: null, player2Type: null,
-        player1Score: 0, player2Score: 0, isAiming: false, isMoving: false,
-        cueBall: null, balls: [], aimLine: { start: null, end: null },
-        power: 0, firstHit: null, gameOver: false
+        currentPlayer: 1, 
+        player1Type: null, 
+        player2Type: null,
+        player1Score: 0, 
+        player2Score: 0, 
+        isAiming: false, 
+        isMoving: false,
+        cueBall: null, 
+        balls: [], 
+        aimLine: { start: null, end: null },
+        power: 0, 
+        firstHit: null, 
+        gameOver: false,
+        consecutiveFouls: 0
     };
     
     createTable();
     createBalls();
     updateUI();
-    updateStatusMessage("Player 1's Turn");
+    updateStatusMessage("Player 1's Turn - Aim and shoot!");
     
     Engine.run(engine);
     Render.run(render);
+}
+
+// Instructions Modal
+const modal = document.getElementById("instructions-modal");
+const instructionsBtn = document.getElementById("instructions-btn");
+const closeBtn = document.getElementsByClassName("close")[0];
+
+instructionsBtn.onclick = function() {
+    modal.style.display = "block";
+}
+
+closeBtn.onclick = function() {
+    modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
 }
 
 document.getElementById('new-game-btn').addEventListener('click', resetGame);
