@@ -3,37 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rofialdo</title>
+    <title>Pool Master - Two Player Game</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="game-wrapper">
         <div class="game-info-panel">
-            <h1>Rofialdo</h1>
+            <h1><i class="fas fa-billiards"></i> Pool Master</h1>
             <div class="players-container">
                 <div id="player1-info" class="player-info active">
                     <div class="player-name">Player 1</div>
-                    <div class="player-type">--- </div>
+                    <div class="player-type">Not Assigned</div>
                     <div class="player-score">0</div>
                 </div>
                 <div id="player2-info" class="player-info">
                     <div class="player-name">Player 2</div>
-                    <div class="player-type">--- </div>
+                    <div class="player-type">Not Assigned</div>
                     <div class="player-score">0</div>
                 </div>
             </div>
             <div id="game-status-message" class="status-message">
-                Player 1's Turn
+                Player 1's Turn - Aim and shoot!
             </div>
-            <button id="new-game-btn" class="new-game-btn">New Game</button>
+            <div class="game-controls">
+                <button id="new-game-btn" class="new-game-btn"><i class="fas fa-redo"></i> New Game</button>
+                <button id="instructions-btn" class="instructions-btn"><i class="fas fa-question-circle"></i> How to Play</button>
+            </div>
         </div>
         <div class="canvas-container">
             <canvas id="game-canvas"></canvas>
             <div id="power-meter" class="power-meter">
-                <div class="power-bar"></div>
+                <div class="power-label">POWER</div>
+                <div class="power-bar-container">
+                    <div class="power-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>How to Play Pool Master</h2>
+            <div class="instructions-content">
+                <h3>Game Objective</h3>
+                <p>Be the first to pocket all your assigned balls (solids or stripes) and then legally pocket the 8-ball to win!</p>
+                
+                <h3>Gameplay</h3>
+                <ul>
+                    <li>Players take turns shooting</li>
+                    <li>Click and drag from the cue ball to aim</li>
+                    <li>Release to shoot with selected power</li>
+                    <li>First player to pocket a ball assigns ball types (solids or stripes)</li>
+                    <li>Players must pocket their own balls first</li>
+                    <li>After pocketing all your balls, target the 8-ball</li>
+                </ul>
+                
+                <h3>Fouls</h3>
+                <ul>
+                    <li>Pocketing the cue ball (scratch)</li>
+                    <li>Pocketing opponent's ball</li>
+                    <li>Hitting opponent's ball first</li>
+                    <li>No ball hit or pocketed</li>
+                </ul>
+                <p>After a foul, the opponent gets ball in hand.</p>
             </div>
         </div>
     </div>
