@@ -154,13 +154,16 @@ body {
 }
 
 .instructions-btn {
-    background-color: #3498db;
+    background-color: rgba(52, 152, 219, 0.5);
     color: white;
+    font-size: 0.9em;
+    padding: 8px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .instructions-btn:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
+    background-color: rgba(52, 152, 219, 0.7);
+    transform: translateY(-1px);
 }
 
 .canvas-container {
